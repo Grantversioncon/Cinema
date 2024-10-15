@@ -1,7 +1,448 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinema Curator</title>
+    <style>
+        /* Global styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(to right, #283E51, #4B79A1);
+            color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 3.5rem;
+            color: #FFC857;
+            text-shadow: 0 0 10px rgba(255, 200, 87, 0.7);
+            font-weight: 900;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-direction: column;
+            text-align: center;
+            background: rgba(76, 101, 126, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .slider {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .slider input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            background: #333;
+            border-radius: 5px;
+            outline: none;
+            transition: background-color 0.3s;
+        }
+
+        .slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #FFC857;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 200, 87, 0.7);
+            transition: transform 0.3s ease;
+        }
+
+        .slider input[type="range"]:hover::-webkit-slider-thumb {
+            transform: scale(1.2);
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-size: 1.5rem;
+            color: #76BED0;
+        }
+
+        .movies-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            width: 90%;
+            max-width: 1200px;
+            margin-bottom: 40px;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        .movie-card {
+            padding: 20px;
+            border-radius: 15px;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: pointer;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .movie-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 0 40px rgba(255, 200, 87, 0.8);
+        }
+
+        .movie-title {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .movie-rating {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #FFD700;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Genre dropdown */
+        .genre-container {
+            margin-top: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .genre-dropdown {
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #333;
+            color: #FFC857;
+            font-size: 1.2rem;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .genre-dropdown:focus {
+            background-color: #555;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: #b5b5b5;
+        }
+
+        /* Genre-specific movie card colors - improved with contrast for readability */
+        .genre-Drama { background-color: #6B2D5C; }
+        .genre-Action { background-color: #C92A2E; }
+        .genre-Animation { background-color: #FF865C; }
+        .genre-Comedy { background-color: #F4A927; }
+        .genre-Crime { background-color: #494949; }
+        .genre-Fantasy { background-color: #764BA2; }
+        .genre-Sci-Fi { background-color: #3AA0D6; }
+        .genre-Western { background-color: #8F7040; }
+        .genre-War { background-color: #806354; }
+        .genre-History { background-color: #675C4B; }
+        .genre-Thriller { background-color: #D64545; }
+        .genre-Romance { background-color: #FF6F69; }
+        .genre-Horror { background-color: #2E2E2E; }
+        .genre-Biography { background-color: #2A7FAA; }
+        .genre-Musical { background-color: #FFABAE; }
+        .genre-Adventure { background-color: #2F9D66; }
+
+        /* Adding animations to movie cards */
+        .movie-card::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 200, 87, 0.2);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+
+        .movie-card:hover::before {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;900&display=swap" rel="stylesheet">
+</head>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+    <h1>Cinema Curator</h1>
+    <div class="slider-container">
+        <label for="ratingRange">Find Movies by Rating: <span id="ratingLabel" style="font-size: 2.5rem; font-weight: 900;">5.0</span></label>
+        <div class="slider">
+            <input type="range" id="ratingRange" min="5" max="10" step="0.1" value="5">
+        </div>
+        <div class="feedback">Slide to filter movies by rating.</div>
+    </div>
+
+    <!-- Genre Dropdown -->
+    <div class="genre-container">
+        <label for="genreSelect">Filter by Genre:</label>
+        <select id="genreSelect" class="genre-dropdown">
+            <option value="All">All Genres</option>
+            <option value="Drama">Drama</option>
+            <option value="Action">Action</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Animation">Animation</option>
+            <option value="Crime">Crime</option>
+            <option value="Fantasy">Fantasy</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+            <option value="Western">Western</option>
+            <option value="War">War</option>
+            <option value="History">History</option>
+            <option value="Thriller">Thriller</option>
+            <option value="Romance">Romance</option>
+            <option value="Horror">Horror</option>
+            <option value="Biography">Biography</option>
+            <option value="Musical">Musical</option>
+            <option value="Adventure">Adventure</option>
+        </select>
+    </div>
+
+    <div class="movies-container" id="moviesContainer"></div>
+
+    <footer>&copy; 2024 Cinema Curator</footer>
+
+    <script>
+        // Movie data loaded from CSV (for demo purposes, hardcoded here)
+        const movieData = [
+        { title: "The Shawshank Redemption", popularity: 174.522, vote_average: 9.3, release_date: "9/23/1994", genre: "Drama" },
+    { title: "The Godfather", popularity: 165.677, vote_average: 9.2, release_date: "3/14/1972", genre: "Crime" },
+    { title: "The Dark Knight", popularity: 200.342, vote_average: 9.0, release_date: "7/18/2008", genre: "Action" },
+    { title: "Schindler's List", popularity: 95.123, vote_average: 9.0, release_date: "12/15/1993", genre: "History" },
+    { title: "12 Angry Men", popularity: 87.654, vote_average: 9.1, release_date: "4/10/1957", genre: "Drama" },
+    { title: "The Lord of the Rings: The Return of the King", popularity: 140.85, vote_average: 9.0, release_date: "12/17/2003", genre: "Fantasy" },
+    { title: "Pulp Fiction", popularity: 130.455, vote_average: 8.9, release_date: "10/14/1994", genre: "Crime" },
+    { title: "Fight Club", popularity: 120.22, vote_average: 8.8, release_date: "10/15/1999", genre: "Drama" },
+    { title: "The Matrix", popularity: 150.569, vote_average: 8.7, release_date: "3/31/1999", genre: "Sci-Fi" },
+    { title: "Inception", popularity: 160.442, vote_average: 8.8, release_date: "7/16/2010", genre: "Sci-Fi" },
+    { title: "The Good, the Bad and the Ugly", popularity: 100.45, vote_average: 9.0, release_date: "12/23/1966", genre: "Western" },
+    { title: "Forrest Gump", popularity: 88.673, vote_average: 8.8, release_date: "7/6/1994", genre: "Drama" },
+    { title: "The Pianist", popularity: 80.342, vote_average: 8.5, release_date: "9/25/2002", genre: "Drama" },
+    { title: "The Lion King", popularity: 75.873, vote_average: 8.5, release_date: "6/15/1994", genre: "Animation" },
+    { title: "The Godfather Part II", popularity: 100.12, vote_average: 9.0, release_date: "12/20/1974", genre: "Crime" },
+    { title: "The Lord of the Rings: The Fellowship of the Ring", popularity: 150.32, vote_average: 8.9, release_date: "12/19/2001", genre: "Fantasy" },
+    { title: "City of God", popularity: 120.67, vote_average: 8.6, release_date: "2/13/2002", genre: "Crime" },
+    { title: "Star Wars: Episode V - The Empire Strikes Back", popularity: 145.87, vote_average: 8.8, release_date: "5/21/1980", genre: "Sci-Fi" },
+    { title: "The Silence of the Lambs", popularity: 135.21, vote_average: 8.6, release_date: "2/14/1991", genre: "Thriller" },
+    { title: "Saving Private Ryan", popularity: 160.34, vote_average: 8.7, release_date: "7/24/1998", genre: "War" },
+    { title: "Spirited Away", popularity: 100.45, vote_average: 8.6, release_date: "7/20/2001", genre: "Animation" },
+    { title: "Sabotage", popularity: 21.044, vote_average: 5.59, release_date: "3/28/2014", genre: "Action" },
+    { title: "Kill Command", popularity: 28.31, vote_average: 5.578, release_date: "5/13/2016", genre: "Action" },
+    { title: "Prisoners", popularity: 55.332, vote_average: 8.098, release_date: "9/19/2013", genre: "Thriller" },
+    { title: "Sansho the Bailiff", popularity: 14.629, vote_average: 8.098, release_date: "3/31/1954", genre: "Drama" },
+    { title: "Pride & Prejudice", popularity: 67.735, vote_average: 8.075, release_date: "9/16/2005", genre: "Romance" },
+    { title: "Far from the Tree", popularity: 11.283, vote_average: 8.074, release_date: "11/24/2021", genre: "Drama" },
+    { title: "How to Train Your Dragon: Homecoming", popularity: 42.511, vote_average: 8.048, release_date: "12/3/2019", genre: "Adventure" },
+    { title: "Children of Heaven", popularity: 10.913, vote_average: 7.914, release_date: "8/1/1997", genre: "Drama" },
+    { title: "Dangal", popularity: 27.948, vote_average: 7.913, release_date: "12/21/2016", genre: "Drama" },
+    { title: "Dancer in the Dark", popularity: 19.15, vote_average: 7.875, release_date: "9/1/2000", genre: "Drama" },
+    { title: "Solaris", popularity: 32.022, vote_average: 7.8, release_date: "3/20/1972", genre: "Drama" },
+    { title: "Mars Needs Moms", popularity: 19.241, vote_average: 6.0, release_date: "3/9/2011", genre: "Drama" },
+    { title: "Dark Phoenix", popularity: 120.384, vote_average: 6.0, release_date: "6/5/2019", genre: "Drama" },
+    { title: "Don Jon", popularity: 35.413, vote_average: 6.0, release_date: "9/12/2013", genre: "Drama" },
+    { title: "The League of Extraordinary Gentlemen", popularity: 23.545, vote_average: 5.965, release_date: "7/11/2003", genre: "Action" },
+    { title: "The Nun", popularity: 73.829, vote_average: 5.893, release_date: "9/5/2018", genre: "Horror" },
+    { title: "Simply Black", popularity: 8.391, vote_average: 5.857, release_date: "7/8/2020", genre: "Drama" },
+    { title: "Sweet Virginia", popularity: 12.177, vote_average: 5.803, release_date: "11/17/2017", genre: "Drama" },
+    { title: "Paranormal Activity", popularity: 34.876, vote_average: 6.002, release_date: "9/14/2007", genre: "Horror" },
+    { title: "Epic Movie", popularity: 20.01, vote_average: 3.853, release_date: "1/25/2007", genre: "Comedy" },
+    { title: "Slender Man", popularity: 23.525, vote_average: 4.301, release_date: "5/17/2018", genre: "Horror" },
+    { title: "George of the Jungle 2", popularity: 10.363, vote_average: 4.432, release_date: "8/18/2003", genre: "Adventure" },
+    { title: "Catwoman", popularity: 29.932, vote_average: 4.599, release_date: "7/22/2004", genre: "Action" },
+    { title: "The ABCs of Death", popularity: 14.679, vote_average: 4.95, release_date: "3/8/2013", genre: "Horror" },
+    { title: "Satanic", popularity: 12.282, vote_average: 4.305, release_date: "7/1/2016", genre: "Horror" },
+    { title: "Hellraiser: Hellworld", popularity: 21.85, vote_average: 4.781, release_date: "9/6/2005", genre: "Horror" },
+    { title: "I Know Who Killed Me", popularity: 14.799, vote_average: 4.535, release_date: "7/27/2007", genre: "Thriller" },
+    { title: "IO", popularity: 19.091, vote_average: 4.946, release_date: "1/18/2019", genre: "Sci-Fi" },
+    { title: "Garfield: A Tail of Two Kitties", popularity: 29.036, vote_average: 5.579, release_date: "6/15/2006", genre: "Comedy" },
+    { title: "Ogni maledetto Natale", popularity: 4.768, vote_average: 5.6, release_date: "11/27/2014", genre: "Comedy" },
+    { title: "They Came Together", popularity: 12.426, vote_average: 5.57, release_date: "6/27/2014", genre: "Comedy" },
+    { title: "All the Boys Love Mandy Lane", popularity: 13.934, vote_average: 5.6, release_date: "9/9/2006", genre: "Horror" },
+    { title: "The Slumber Party Massacre", popularity: 15.961, vote_average: 5.558, release_date: "9/10/1982", genre: "Horror" },
+    { title: "Wedding Daze", popularity: 24.884, vote_average: 5.547, release_date: "9/9/2006", genre: "Comedy" },
+    { title: "In the Tall Grass", popularity: 15.966, vote_average: 5.544, release_date: "9/20/2019", genre: "Horror" },
+    { title: "Big Mommas: Like Father, Like Son", popularity: 35.943, vote_average: 5.5, release_date: "2/16/2011", genre: "Comedy" },
+    { title: "Congo", popularity: 21.06, vote_average: 5.533, release_date: "6/9/1995", genre: "Adventure" },
+    { title: "Drive Angry", popularity: 38.814, vote_average: 5.521, release_date: "2/24/2011", genre: "Action" },
+    { title: "Over Her Dead Body", popularity: 17.416, vote_average: 5.521, release_date: "2/1/2008", genre: "Horror" },
+    { title: "Mortdecai", popularity: 24.294, vote_average: 5.513, release_date: "1/21/2015", genre: "Comedy" },
+    { title: "Trespass", popularity: 11.983, vote_average: 5.513, release_date: "10/13/2011", genre: "Action" },
+    { title: "The Oranges", popularity: 10.731, vote_average: 5.5, release_date: "9/9/2011", genre: "Drama" },
+    { title: "Spread", popularity: 22.098, vote_average: 5.505, release_date: "1/16/2009", genre: "Comedy" },
+    { title: "Me and Marilyn", popularity: 5.781, vote_average: 5.49, release_date: "12/17/2009", genre: "Drama" },
+    { title: "Cube 2: Hypercube", popularity: 12.754, vote_average: 5.49, release_date: "4/15/2002", genre: "Sci-Fi" },
+    { title: "Virtuosity", popularity: 16.672, vote_average: 5.476, release_date: "8/4/1995", genre: "Sci-Fi" },
+    { title: "The Butterfly Effect 3: Revelations", popularity: 22.516, vote_average: 5.475, release_date: "1/9/2009", genre: "Thriller" },
+    { title: "Christmas Wedding Planner", popularity: 11.723, vote_average: 5.462, release_date: "12/14/2017", genre: "Comedy" },
+    { title: "Rampart", popularity: 14.366, vote_average: 5.461, release_date: "11/23/2011", genre: "Drama" },
+    { title: "The Haunting", popularity: 28.368, vote_average: 5.45, release_date: "7/23/1999", genre: "Horror" },
+    { title: "Unfinished Business", popularity: 10.61, vote_average: 5.4, release_date: "3/5/2015", genre: "Comedy" },
+    { title: "Here Come the Teachers", popularity: 5.881, vote_average: 5.429, release_date: "5/1/2018", genre: "Comedy" },
+    { title: "Wildling", popularity: 20.842, vote_average: 5.4, release_date: "4/13/2018", genre: "Horror" },
+    { title: "Jessabelle", popularity: 15.46, vote_average: 5.418, release_date: "11/7/2014", genre: "Horror" },
+    { title: "The Visitors: Bastille Day", popularity: 13.8, vote_average: 4.1, release_date: "3/23/2016", genre: "Action" },
+    { title: "Baby Geniuses", popularity: 12.215, vote_average: 4.109, release_date: "3/12/1999", genre: "Family" },
+    { title: "Barbershop: The Next Cut", popularity: 24.957, vote_average: 6.3, release_date: "4/15/2016", genre: "Comedy" },
+    { title: "Muppets Most Wanted", popularity: 19.104, vote_average: 6.317, release_date: "3/20/2014", genre: "Family" },
+    { title: "Jawbreaker", popularity: 22.076, vote_average: 6.311, release_date: "1/30/1999", genre: "Thriller" },
+    { title: "Be Kind Rewind", popularity: 10.286, vote_average: 6.311, release_date: "1/20/2008", genre: "Comedy" },
+    { title: "Sierra Burgess Is a Loser", popularity: 16.856, vote_average: 6.307, release_date: "9/7/2018", genre: "Comedy" },
+    { title: "Diary of a Wimpy Kid: Dog Days", popularity: 24.313, vote_average: 6.307, release_date: "8/2/2012", genre: "Comedy" },
+    { title: "The Missing", popularity: 32.168, vote_average: 6.302, release_date: "11/26/2003", genre: "Thriller" },
+    { title: "Harley Davidson and the Marlboro Man", popularity: 14.605, vote_average: 6.302, release_date: "8/23/1991", genre: "Action" },
+    { title: "Shrek the Third", popularity: 82.29, vote_average: 6.298, release_date: "5/17/2007", genre: "Animation" },
+    { title: "Mandibles", popularity: 10.56, vote_average: 6.297, release_date: "5/19/2021", genre: "Comedy" },
+    { title: "The Discovery", popularity: 18.969, vote_average: 6.294, release_date: "3/31/2017", genre: "Sci-Fi" },
+    { title: "Whiskey Tango Foxtrot", popularity: 12.185, vote_average: 6.3, release_date: "3/4/2016", genre: "Comedy" },
+    { title: "Intimacy", popularity: 29.301, vote_average: 6.3, release_date: "1/20/2001", genre: "Drama" },
+    { title: "Like a Boss", popularity: 18.565, vote_average: 6.289, release_date: "1/9/2020", genre: "Comedy" },
+    { title: "The Raven", popularity: 20.715, vote_average: 6.286, release_date: "3/9/2012", genre: "Horror" },
+    { title: "Click", popularity: 34.277, vote_average: 6.286, release_date: "6/23/2006", genre: "Comedy" },
+    { title: "Serial (Bad) Weddings 3", popularity: 16.425, vote_average: 6.279, release_date: "12/21/2021", genre: "Comedy" },
+    { title: "Dangerous Lies", popularity: 18.659, vote_average: 6.279, release_date: "4/30/2020", genre: "Thriller" },
+    { title: "Mystic Pizza", popularity: 14.728, vote_average: 6.3, release_date: "10/13/1988", genre: "Drama" },
+    { title: "Internal Affairs", popularity: 21.013, vote_average: 6.276, release_date: "1/12/1990", genre: "Crime" },
+    { title: "Cassandra's Dream", popularity: 10.624, vote_average: 6.274, release_date: "10/31/2007", genre: "Drama" },
+    { title: "Wet Hot American Summer", popularity: 11.119, vote_average: 6.3, release_date: "7/27/2001", genre: "Comedy" },
+    { title: "Cake", popularity: 24.045, vote_average: 6.269, release_date: "9/7/2014", genre: "Drama" },
+    { title: "Being 17", popularity: 13.047, vote_average: 6.845, release_date: "2/27/2016", genre: "Drama" },
+    { title: "A Girl Walks Home Alone at Night", popularity: 15.856, vote_average: 6.845, release_date: "11/21/2014", genre: "Horror" },
+    { title: "Quest for Camelot", popularity: 16.471, vote_average: 6.843, release_date: "5/15/1998", genre: "Adventure" },
+    { title: "Iron Man 2", popularity: 99.533, vote_average: 6.843, release_date: "4/28/2010", genre: "Action" },
+    { title: "Payback", popularity: 20.473, vote_average: 6.8, release_date: "2/5/1999", genre: "Action" },
+    { title: "Death Proof", popularity: 38.039, vote_average: 6.8, release_date: "5/22/2007", genre: "Action" },
+    { title: "Lost and Delirious", popularity: 13.394, vote_average: 6.8, release_date: "1/21/2001", genre: "Drama" },
+    { title: "Another Cinderella Story", popularity: 20.952, vote_average: 6.8, release_date: "9/16/2008", genre: "Musical" },
+    { title: "Bird", popularity: 10.922, vote_average: 6.83, release_date: "6/1/1988", genre: "Biographical" },
+    { title: "Outlaw King", popularity: 25.255, vote_average: 6.829, release_date: "9/6/2018", genre: "Action" },
+    { title: "Jumanji: Welcome to the Jungle", popularity: 47.707, vote_average: 6.826, release_date: "12/9/2017", genre: "Adventure" },
+    { title: "Chronicle", popularity: 33.068, vote_average: 6.825, release_date: "2/1/2012", genre: "Sci-Fi" },
+    { title: "Any Given Sunday", popularity: 20.238, vote_average: 6.821, release_date: "12/22/1999", genre: "Sports" },
+    { title: "Enchanted", popularity: 41.923, vote_average: 6.821, release_date: "11/20/2007", genre: "Musical" },
+    { title: "The House at the End of Time", popularity: 11.928, vote_average: 6.816, release_date: "6/21/2013", genre: "Horror" },
+    { title: "Tom at the Farm", popularity: 12.982, vote_average: 6.816, release_date: "4/16/2014", genre: "Thriller" },
+    { title: "Winter's Bone", popularity: 16.814, vote_average: 6.811, release_date: "6/11/2010", genre: "Drama" },
+    { title: "The Last Boy Scout", popularity: 23.842, vote_average: 6.812, release_date: "12/13/1991", genre: "Action" },
+    { title: "Cube", popularity: 22.259, vote_average: 6.807, release_date: "12/10/1997", genre: "Sci-Fi" },
+    { title: "Mia and the White Lion", popularity: 32.337, vote_average: 7.3, release_date: "8/2/2018", genre: "Family" },
+    { title: "Maleficent: Mistress of Evil", popularity: 66.191, vote_average: 7.308, release_date: "10/16/2019", genre: "Fantasy" },
+    { title: "Knife in the Water", popularity: 12.397, vote_average: 7.3, release_date: "3/9/1962", genre: "Thriller" },
+    { title: "Gone Baby Gone", popularity: 20.009, vote_average: 7.304, release_date: "9/18/2007", genre: "Crime" },
+    { title: "Jeremiah Johnson", popularity: 23.175, vote_average: 7.3, release_date: "9/10/1972", genre: "Western" },
+    { title: "The Aristocats", popularity: 48.938, vote_average: 7.299, release_date: "11/13/1970", genre: "Animation" },
+    { title: "Conspiracy", popularity: 21.486, vote_average: 7.294, release_date: "5/19/2001", genre: "Thriller" },
+    { title: "The Evil Dead", popularity: 43.908, vote_average: 7.294, release_date: "9/10/1981", genre: "Horror" },
+    { title: "Kung Fu Panda", popularity: 81.576, vote_average: 7.289, release_date: "6/4/2008", genre: "Animation" },
+    { title: "Lethal Weapon", popularity: 28.197, vote_average: 7.289, release_date: "3/6/1987", genre: "Action" },
+    { title: "Promise at Dawn", popularity: 13.646, vote_average: 7.3, release_date: "12/20/2017", genre: "Drama" },
+    { title: "Suite Française", popularity: 15.89, vote_average: 7.3, release_date: "3/12/2015", genre: "War" },
+    { title: "The Duellists", popularity: 12.823, vote_average: 7.3, release_date: "8/31/1977", genre: "War" },
+    { title: "The Adventures of Priscilla, Queen of the Desert", popularity: 18.014, vote_average: 7.3, release_date: "5/31/1994", genre: "Comedy" },
+    { title: "Stardust", popularity: 21.821, vote_average: 7.3, release_date: "8/9/2007", genre: "Fantasy" },
+    { title: "Tokyo Story", popularity: 27.808, vote_average: 8.2, release_date: "11/3/1953", genre: "Drama" },
+    { title: "Zack Snyder's Justice League", popularity: 83.731, vote_average: 8.148, release_date: "3/18/2021", genre: "Action" },
+    { title: "Better Days", popularity: 29.312, vote_average: 8.1, release_date: "10/25/2019", genre: "Drama" },
+    { title: "Terminator 2: Judgment Day", popularity: 89.436, vote_average: 8.119, release_date: "7/3/1991", genre: "Action" },
+    { title: "Double Indemnity", popularity: 14.482, vote_average: 8.1, release_date: "7/6/1944", genre: "Crime" },
+    { title: "Prisoners", popularity: 55.332, vote_average: 8.098, release_date: "9/19/2013", genre: "Thriller" },
+    { title: "Sansho the Bailiff", popularity: 14.629, vote_average: 8.098, release_date: "3/31/1954", genre: "Drama" },
+    { title: "Far from the Tree", popularity: 11.283, vote_average: 8.074, release_date: "11/24/2021", genre: "Drama" },
+    { title: "Pride & Prejudice", popularity: 67.735, vote_average: 8.075, release_date: "9/16/2005", genre: "Romance" },
+    { title: "The Grand Budapest Hotel", popularity: 38.208, vote_average: 8.1, release_date: "2/26/2014", genre: "Comedy" },
+    { title: "How to Train Your Dragon: Homecoming", popularity: 42.511, vote_average: 8.048, release_date: "12/3/2019", genre: "Adventure" },
+    { title: "Beyond the Universe", popularity: 13.881, vote_average: 8.027, release_date: "10/27/2022", genre: "Sci-Fi" },
+    { title: "Jojo Rabbit", popularity: 26.21, vote_average: 8.024, release_date: "10/18/2019", genre: "Comedy" },
+    { title: "Black Beauty", popularity: 12.038, vote_average: 8, release_date: "11/27/2020", genre: "Family" },
+    { title: "Hachi: A Dog's Tale", popularity: 37.023, vote_average: 8.008, release_date: "6/8/2009", genre: "Family" },
+    { title: "In a Heartbeat", popularity: 5.126, vote_average: 7.995, release_date: "6/1/2017", genre: "Animation" },
+    { title: "The Lion King", popularity: 75.873, vote_average: 8.5, release_date: "6/15/1994", genre: "Animation" },
+    { title: "The Godfather Part II", popularity: 100.12, vote_average: 9.0, release_date: "12/20/1974", genre: "Crime" },
+    { title: "The Lord of the Rings: The Fellowship of the Ring", popularity: 150.32, vote_average: 8.9, release_date: "12/19/2001", genre: "Fantasy" },
+    { title: "City of God", popularity: 120.67, vote_average: 8.6, release_date: "2/13/2002", genre: "Crime" },
+    { title: "Star Wars: Episode V - The Empire Strikes Back", popularity: 145.87, vote_average: 8.8, release_date: "5/21/1980", genre: "Sci-Fi" },
+    { title: "The Silence of the Lambs", popularity: 135.21, vote_average: 8.6, release_date: "2/14/1991", genre: "Thriller" },
+    { title: "Saving Private Ryan", popularity: 160.34, vote_average: 8.7, release_date: "7/24/1998", genre: "War" },
+    { title: "Spirited Away", popularity: 100.45, vote_average: 8.6, release_date: "7/20/2001", genre: "Animation" }
+        ];
+
+        const ratingRange = document.getElementById("ratingRange");
+        const ratingLabel = document.getElementById("ratingLabel");
+        const genreSelect = document.getElementById("genreSelect");
+        const moviesContainer = document.getElementById("moviesContainer");
+
+        // Function to update displayed movies based on the slider's rating and selected genre
+        function updateMovies() {
+            const minRating = parseFloat(ratingRange.value);
+            const selectedGenre = genreSelect.value;
+            ratingLabel.textContent = minRating.toFixed(1);
+
+            // Filter movies based on minimum rating and selected genre
+            let filteredMovies = movieData.filter(movie => movie.vote_average >= minRating);
+
+            if (selectedGenre !== 'All') {
+                filteredMovies = filteredMovies.filter(movie => movie.genre === selectedGenre);
+            }
+
+            // Sort movies by the closest to the selected rating, then ascending
+            filteredMovies.sort((a, b) => Math.abs(a.vote_average - minRating) - Math.abs(b.vote_average - minRating) || a.vote_average - b.vote_average);
+
+            // Clear existing movies
+            moviesContainer.innerHTML = '';
+
+            if (filteredMovies.length === 0) {
+                moviesContainer.innerHTML = '<div class="feedback">No movies found for the selected rating and genre.</div>';
+            } else {
+                // Loop through filtered movies and create cards
+                filteredMovies.forEach(movie => {
+                    const movieCard = document.createElement("div");
+                    movieCard.classList.add("movie-card", `genre-${movie.genre.replace(/\s+/g, '-')}`);
+
+                    movieCard.innerHTML = `
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-rating">Rating: ${movie.vote_average.toFixed(1)}</div>
+                    `;
+
+                    // Append the movie card to the container
+                    moviesContainer.appendChild(movieCard);
+                });
+            }
+        }
+
+        // Initialize movie list on page load
+        updateMovies();
+
+        // Update movies when the slider value or genre selection changes
+        ratingRange.addEventListener("input", updateMovies);
+        genreSelect.addEventListener("change", updateMovies);
+    </script>
 </body>
 </html>
